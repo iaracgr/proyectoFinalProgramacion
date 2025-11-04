@@ -38,6 +38,12 @@ public class GestionAlumnosGUI extends JFrame implements ActionListener {
         setSize(900, 550);
 
         this.listaAlumnos = new ArrayList<>();
+        // Precargar alumnos
+        listaAlumnos.add(new Alumno(siguienteId++, "Jane", "Doe", 24, "12345678", "Software", "Primero", "Primera"));
+        listaAlumnos.add(new Alumno(siguienteId++, "Agus", "Peralta", 23, "23456789", "Ciberseguridad", "Segundo", "Segunda"));
+        listaAlumnos.add(new Alumno(siguienteId++, "Valentina", "Perez", 22, "34567890", "Analísis de Datos", "Tercero", "Tercera"));
+        listaAlumnos.add(new Alumno(siguienteId++, "Martin", "Rojas", 25, "45678901", "Software", "Segundo", "Primera"));
+        listaAlumnos.add(new Alumno(siguienteId++, "Lucia", "Fernandez", 21, "56789012", "Ciberseguridad", "Primero", "Segunda"));
 
         // 1. Panel de fondo con logo
         FondoConLogoPanel fondoPanel = new FondoConLogoPanel();
