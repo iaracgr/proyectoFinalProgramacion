@@ -80,7 +80,7 @@ public class GestionAlumnosGUI extends JFrame implements ActionListener {
     }
 
     /**
-     * Agrega un nuevo alumno, creando las estructuras de Carrera/Curso/División.
+     * Agrega un nuevo alumno
      */
     private void agregarAlumno(String nombre, String apellido, int edad,
                                String carrera, String division, String curso, String dni) {
@@ -166,6 +166,9 @@ public class GestionAlumnosGUI extends JFrame implements ActionListener {
         String[] opcionesDivision = {"Primera", "Segunda", "Tercera"};
         JComboBox<String> cmbDivision = new JComboBox<>(opcionesDivision);
 
+        String[] opcionesCarrera = {"Software", "Ciberseguridad", "Analísis de Datos"};
+        JComboBox<String> cmCarrera = new JComboBox<>(opcionesCarrera);
+
         // --- Panel de Formulario ---
         JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
 
@@ -174,7 +177,7 @@ public class GestionAlumnosGUI extends JFrame implements ActionListener {
         panel.add(new JLabel("Edad:")); panel.add(txtEdad);
         panel.add(new JLabel("Curso:")); panel.add(cmbCurso);        // Desplegable
         panel.add(new JLabel("División:")); panel.add(cmbDivision);  // Desplegable
-        panel.add(new JLabel("Carrera:")); panel.add(txtCarrera);
+        panel.add(new JLabel("Carrera:")); panel.add(cmCarrera); //Desplegable
         panel.add(new JLabel("DNI (min 6 dígitos):")); panel.add(txtDni);
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Ingrese Datos del Nuevo Alumno", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -189,7 +192,7 @@ public class GestionAlumnosGUI extends JFrame implements ActionListener {
             String divisionSeleccionada = (String) cmbDivision.getSelectedItem();
 
             // Validación de campos vacíos
-            if (nombre.isEmpty() || apellido.isEmpty() || txtEdad.getText().isEmpty() || dni.isEmpty() || carrera.isEmpty()) {
+            if (nombre.isEmpty() || apellido.isEmpty() || txtEdad.getText().isEmpty() || dni.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "⚠️ Todos los campos son obligatorios.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }

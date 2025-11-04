@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 public class FondoConLogoPanel extends JPanel {
 
     private Image backgroundImage;
-    // Nombre del archivo de imagen. Debe estar en la misma carpeta que los archivos compilados (.class)
+
     private static final String LOGO_FILE = "img/logo_ies.jpg";
 
     public FondoConLogoPanel() {
