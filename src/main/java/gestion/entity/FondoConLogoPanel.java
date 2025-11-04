@@ -14,24 +14,26 @@ public class FondoConLogoPanel extends JPanel {
 
     private Image backgroundImage;
 
-    private static final String LOGO_FILE = "img/logo_ies.jpg";
+    private static final String LOGO_FILE = "/img/logo_ies.jpg";
 
     public FondoConLogoPanel() {
-        // Carga la imagen del logo en el constructor
         try {
-            // Intenta cargar la imagen como un recurso (ruta relativa al paquete)
-            backgroundImage = new ImageIcon(getClass().getResource("/" + LOGO_FILE)).getImage();
-
-            // Si eso falla, intenta cargarlo desde el directorio de trabajo (ruta directa)
-            if (backgroundImage == null) {
-                System.err.println("Advertencia: No se pudo cargar el logo como recurso. Intentando carga directa.");
-                backgroundImage = new ImageIcon(LOGO_FILE).getImage();
+            // 1. Intenta cargar desde los recursos del classpath
+            java.net.URL url = getClass().getResource("/img/logo_ies.jpg");
+            if (url != null) {
+                backgroundImage = new ImageIcon(url).getImage();
+                System.out.println("✅ Logo cargado desde recursos.");
+            } else {
+                // 2. Si no está en classpath, intenta ruta absoluta o relativa al proyecto
+                System.err.println("⚠️ No se encontró /img/logo_ies.jpg en el classpath. Intentando ruta directa...");
+                backgroundImage = new ImageIcon("src/main/resources/img/logo_ies.jpg").getImage();
             }
         } catch (Exception e) {
-            System.err.println("Error al cargar la imagen de fondo: " + LOGO_FILE + ". Verifique la ruta.");
+            System.err.println("❌ Error al cargar el logo: " + e.getMessage());
             backgroundImage = null;
         }
     }
+
 
     /**
      * Sobrescribe el método de pintado para dibujar el fondo antes que los componentes.
