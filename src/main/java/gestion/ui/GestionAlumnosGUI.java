@@ -1,10 +1,10 @@
 package gestion.ui;
 
+// Imports de entidades
 import gestion.entity.Alumno;
-import gestion.entity.Carrera;
-import gestion.entity.Curso;
-import gestion.entity.Division;
+import gestion.entity.FondoConLogoPanel; // ¡Asegúrate de importar el panel de fondo!
 
+// Imports de Swing y Java
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -13,23 +13,34 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 
+/**
+ * Interfaz Gráfica para la Gestión de Alumnos.
+ * Incluye Fondo con Logo (FondoConLogoPanel) y JComboBox para Curso y División.
+ */
 public class GestionAlumnosGUI extends JFrame implements ActionListener {
 
+    // --- Componentes de la Interfaz ---
     private JTextArea areaResultados;
     private JButton btnAgregar;
     private JButton btnMostrar;
     private JButton btnBuscar;
 
+    // --- Lógica de Datos ---
     private List<Alumno> listaAlumnos;
+    private int siguienteId = 1; // Contador para asignar IDs internos
 
     public GestionAlumnosGUI() {
-        super("Administración de Alumnos (Swing Avanzado)");
+        super("Administración de Alumnos IES 9-008");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 500);
 
         this.listaAlumnos = new ArrayList<>();
 
-        // Componentes UI
+        // 1. Crear el panel de fondo e imagen (FondoConLogoPanel)
+        FondoConLogoPanel fondoPanel = new FondoConLogoPanel();
+        fondoPanel.setLayout(new BorderLayout()); // Necesario para organizar componentes encima
+
+        // 2. Componentes UI
         areaResultados = new JTextArea();
         areaResultados.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(areaResultados);
@@ -38,15 +49,20 @@ public class GestionAlumnosGUI extends JFrame implements ActionListener {
         btnMostrar = new JButton("2. Mostrar Todos");
         btnBuscar = new JButton("3. Buscar por DNI");
 
+        // Panel de Botones
         JPanel panelBotones = new JPanel();
         panelBotones.add(btnAgregar);
         panelBotones.add(btnMostrar);
         panelBotones.add(btnBuscar);
 
-        setLayout(new BorderLayout());
-        add(scrollPane, BorderLayout.CENTER);
-        add(panelBotones, BorderLayout.NORTH);
+        // 3. Distribución de la Ventana: Añadir componentes al fondoPanel
+        fondoPanel.add(scrollPane, BorderLayout.CENTER); // Centro: área de resultados
+        fondoPanel.add(panelBotones, BorderLayout.NORTH); // Norte: botones
 
+        // 4. Establecer el fondoPanel como el contenido principal del JFrame
+        setContentPane(fondoPanel);
+
+        // 5. Registro de Listeners
         btnAgregar.addActionListener(this);
         btnMostrar.addActionListener(this);
         btnBuscar.addActionListener(this);
@@ -54,42 +70,40 @@ public class GestionAlumnosGUI extends JFrame implements ActionListener {
         setVisible(true);
     }
 
+    // -----------------------------------------------------------------
+    // MÉTODOS DE LÓGICA Y DATOS
+    // -----------------------------------------------------------------
+
+    /** Verifica si un DNI ya existe en la lista de alumnos. */
     private boolean dniExiste(String dni) {
         return listaAlumnos.stream().anyMatch(a -> a.getDni().equals(dni));
     }
 
+    /**
+     * Agrega un nuevo alumno, creando las estructuras de Carrera/Curso/División.
+     */
     private void agregarAlumno(String nombre, String apellido, int edad,
-                               String cursoNombre, String divisionNombre, String carreraNombre, String dni) {
+                               String carrera, String division, String curso, String dni) {
 
+        // 1. Validaciones
         if (dni.length() < 6) {
             JOptionPane.showMessageDialog(this, "⚠️ El DNI debe tener mínimo 6 dígitos.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
         if (dniExiste(dni)) {
             JOptionPane.showMessageDialog(this, "⚠️ Ya existe un alumno con el DNI: " + dni, "DNI Duplicado", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Crear objetos completos con listas vacías
-        Division division = new Division(divisionNombre, null, new ArrayList<>());
-        Curso curso = new Curso(cursoNombre, null, new ArrayList<>());
-        curso.getDivisiones().add(division);       // asignamos la división al curso
-        division.setCurso(curso);                  // asignamos el curso a la división
-
-        Carrera carrera = new Carrera(carreraNombre, 0, new ArrayList<>());
-        carrera.getCursos().add(curso);            // asignamos el curso a la carrera
-        curso.setCarrera(carrera);                 // asignamos la carrera al curso
-
-        // Crear alumno
-        Alumno nuevoAlumno = new Alumno(nombre, apellido, edad, dni, carrera, curso, division);
+        // 3. Creación del Alumno
+        Alumno nuevoAlumno = new Alumno(siguienteId++, nombre, apellido, edad, dni, carrera, curso, division);
         listaAlumnos.add(nuevoAlumno);
-        division.getAlumnos().add(nuevoAlumno);   // agregamos el alumno a la división
 
-        JOptionPane.showMessageDialog(this, "✅ Alumno agregado exitosamente con ID: " + nuevoAlumno.getId(), "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, "✅ Alumno agregado: " + nombre + " " + apellido + " (ID: " + nuevoAlumno.getId() + ")", "Éxito", JOptionPane.INFORMATION_MESSAGE);
         mostrarTodosLosAlumnos();
     }
 
+    /** Muestra todos los alumnos en el área de resultados. */
     private void mostrarTodosLosAlumnos() {
         areaResultados.setText("");
         areaResultados.append("--- LISTA DE ALUMNOS REGISTRADOS (" + listaAlumnos.size() + ") ---\n");
@@ -109,16 +123,21 @@ public class GestionAlumnosGUI extends JFrame implements ActionListener {
                     alumno.getDni(),
                     alumno.getNombre() + " " + alumno.getApellido(),
                     alumno.getEdad(),
-                    alumno.getCurso().getNombre() + " " + alumno.getDivision().getNombre(),
-                    alumno.getCarrera().getNombre()
+                    alumno.getCurso()+ " " + alumno.getDivision(),
+                    alumno.getCarrera()
             ));
         }
         areaResultados.append("--------------------------------------------------------------------------------------\n");
     }
 
+    /** Busca un alumno por DNI. */
     private Alumno buscarAlumnoPorDni(String dni) {
         return listaAlumnos.stream().filter(a -> a.getDni().equals(dni)).findFirst().orElse(null);
     }
+
+    // -----------------------------------------------------------------
+    // MANEJO DE EVENTOS Y DIÁLOGOS
+    // -----------------------------------------------------------------
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -131,52 +150,73 @@ public class GestionAlumnosGUI extends JFrame implements ActionListener {
         }
     }
 
+    /** Muestra el diálogo para agregar alumno, utilizando JComboBox. */
     private void solicitarDatosAgregar() {
+        // --- JText Fields ---
         JTextField txtNombre = new JTextField(15);
         JTextField txtApellido = new JTextField(15);
         JTextField txtEdad = new JTextField(5);
-        JTextField txtCurso = new JTextField(5);
-        JTextField txtDivision = new JTextField(5);
         JTextField txtCarrera = new JTextField(15);
         JTextField txtDni = new JTextField(10);
 
+        // --- JComboBox (Desplegables) ---
+        String[] opcionesCurso = {"Primero", "Segundo", "Tercero"};
+        JComboBox<String> cmbCurso = new JComboBox<>(opcionesCurso);
+
+        String[] opcionesDivision = {"Primera", "Segunda", "Tercera"};
+        JComboBox<String> cmbDivision = new JComboBox<>(opcionesDivision);
+
+        // --- Panel de Formulario ---
         JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
+
         panel.add(new JLabel("Nombre:")); panel.add(txtNombre);
         panel.add(new JLabel("Apellido:")); panel.add(txtApellido);
         panel.add(new JLabel("Edad:")); panel.add(txtEdad);
-        panel.add(new JLabel("Curso:")); panel.add(txtCurso);
-        panel.add(new JLabel("División:")); panel.add(txtDivision);
+        panel.add(new JLabel("Curso:")); panel.add(cmbCurso);        // Desplegable
+        panel.add(new JLabel("División:")); panel.add(cmbDivision);  // Desplegable
         panel.add(new JLabel("Carrera:")); panel.add(txtCarrera);
         panel.add(new JLabel("DNI (min 6 dígitos):")); panel.add(txtDni);
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Ingrese Datos del Nuevo Alumno", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
         if (result == JOptionPane.OK_OPTION) {
             String nombre = txtNombre.getText().trim();
             String apellido = txtApellido.getText().trim();
             String dni = txtDni.getText().trim();
+            String carrera = txtCarrera.getText().trim();
 
-            if (nombre.isEmpty() || apellido.isEmpty() || txtEdad.getText().isEmpty() || dni.isEmpty()) {
+            String cursoSeleccionado = (String) cmbCurso.getSelectedItem();
+            String divisionSeleccionada = (String) cmbDivision.getSelectedItem();
+
+            // Validación de campos vacíos
+            if (nombre.isEmpty() || apellido.isEmpty() || txtEdad.getText().isEmpty() || dni.isEmpty() || carrera.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "⚠️ Todos los campos son obligatorios.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             try {
+                // Validación de Edad
                 int edad = Integer.parseInt(txtEdad.getText().trim());
                 if (edad <= 0 || edad > 100) throw new NumberFormatException();
-                agregarAlumno(nombre, apellido, edad, txtCurso.getText().trim(), txtDivision.getText().trim(), txtCarrera.getText().trim(), dni);
+
+                // Llama al método de agregar
+                agregarAlumno(nombre, apellido, edad,
+                        cursoSeleccionado, divisionSeleccionada, carrera, dni);
+
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "⚠️ La Edad debe ser un número entero válido.", "Error de Entrada", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
 
+    /** Muestra el diálogo para buscar alumno por DNI. */
     private void solicitarDatosBuscar() {
-        String dniStr = JOptionPane.showInputDialog(this, "Ingrese el DNI (6 dígitos) del alumno a buscar:", "Buscar Alumno por DNI", JOptionPane.QUESTION_MESSAGE);
+        String dniStr = JOptionPane.showInputDialog(this, "Ingrese el DNI (mínimo 6 dígitos) del alumno a buscar:", "Buscar Alumno por DNI", JOptionPane.QUESTION_MESSAGE);
         if (dniStr == null || dniStr.trim().isEmpty()) return;
 
         String dniBuscar = dniStr.trim();
         if (dniBuscar.length() < 6) {
-            JOptionPane.showMessageDialog(this, "⚠️ El DNI debe ser mayor a 6 dígitos.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "⚠️ El DNI debe tener mínimo 6 dígitos para la búsqueda.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -188,4 +228,7 @@ public class GestionAlumnosGUI extends JFrame implements ActionListener {
         }
     }
 
+    public static void main(String[] args) {
+        javax.swing.SwingUtilities.invokeLater(() -> new GestionAlumnosGUI());
+    }
 }
