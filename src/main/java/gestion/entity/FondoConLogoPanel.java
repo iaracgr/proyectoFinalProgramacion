@@ -19,7 +19,7 @@ public class FondoConLogoPanel extends JPanel {
     public FondoConLogoPanel() {
         try {
             // 1. Intenta cargar desde los recursos del classpath
-            java.net.URL url = getClass().getResource("/img/logo_ies.jpg");
+            java.net.URL url = getClass().getResource(LOGO_FILE);
             if (url != null) {
                 backgroundImage = new ImageIcon(url).getImage();
                 System.out.println("✅ Logo cargado desde recursos.");
